@@ -1,0 +1,523 @@
+{
+  "info": {
+    "_postman_id": "8b8f6e7a-52e2-4d3c-9c2b-rusunawa-api",
+    "name": "Rusunawa API - 10 Basic Tests",
+    "description": "Collection pengujian dasar API Rusunawa berdasarkan route, FormRequest, controller, middleware, dan seeder yang diperiksa. Jalankan berurutan menggunakan Collection Runner. Hasil baru dianggap aktual setelah Collection dijalankan pada server lokal.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "admin_token",
+      "value": ""
+    },
+    {
+      "key": "resident_token",
+      "value": ""
+    },
+    {
+      "key": "room_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Login Admin (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "login"
+          ]
+        },
+        "description": "Login menggunakan akun dari UserSeeder. Menyimpan token ke collection variable admin_token.",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@ubbg.ac.id\",\n  \"password\": \"password\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Response contains admin token\", function () {",
+              "    pm.expect(body).to.have.nested.property(\"data.token\");",
+              "});",
+              "if (body.data && body.data.token) {",
+              "    pm.collectionVariables.set(\"admin_token\", body.data.token);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Login Penghuni (200)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "login"
+          ]
+        },
+        "description": "Login akun penghuni dari UserSeeder. Menyimpan token ke collection variable resident_token.",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"penghuni@ubbg.ac.id\",\n  \"password\": \"password\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Response contains resident token\", function () {",
+              "    pm.expect(body).to.have.nested.property(\"data.token\");",
+              "});",
+              "if (body.data && body.data.token) {",
+              "    pm.collectionVariables.set(\"resident_token\", body.data.token);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Login Password Salah (422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "login"
+          ]
+        },
+        "description": "Controller memang mengembalikan HTTP 422 untuk kredensial yang salah.",
+        "auth": {
+          "type": "noauth"
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@ubbg.ac.id\",\n  \"password\": \"password-salah\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 422 for invalid credentials\", function () { pm.response.to.have.status(422); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Error message is present\", function () {",
+              "    pm.expect(body.message).to.eql(\"Email atau kata sandi salah.\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 - Profil Penghuni dengan Token (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "me"
+          ]
+        },
+        "description": "Memastikan token Sanctum penghuni dapat mengakses profil.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{resident_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Profile response contains user identity\", function () {",
+              "    pm.expect(body).to.have.property(\"data\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 - Profil Tanpa Token (401)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "me"
+          ]
+        },
+        "description": "Memastikan endpoint yang dilindungi Sanctum menolak request tanpa token.",
+        "auth": {
+          "type": "noauth"
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 401 without bearer token\", function () { pm.response.to.have.status(401); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 - Daftar Kamar dengan Token (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/rooms",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "rooms"
+          ]
+        },
+        "description": "Mengambil daftar kamar dan menyimpan ID kamar pertama untuk request detail.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{resident_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Room collection contains data array\", function () {",
+              "    pm.expect(body).to.have.property(\"data\");",
+              "    pm.expect(body.data).to.be.an(\"array\");",
+              "});",
+              "if (body.data && body.data.length > 0) {",
+              "    pm.collectionVariables.set(\"room_id\", String(body.data[0].id));",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 - Detail Kamar (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/rooms/{{room_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "rooms",
+            "{{room_id}}"
+          ]
+        },
+        "description": "Menggunakan room_id yang disimpan otomatis dari request daftar kamar. Jalankan setelah request nomor 06.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{resident_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Room detail response is JSON\", function () {",
+              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 - Booking Milik Penghuni (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/bookings/mine",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "bookings",
+            "mine"
+          ]
+        },
+        "description": "Memastikan penghuni dapat melihat daftar booking miliknya.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{resident_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200\", function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Response contains bookings array\", function () {",
+              "    pm.expect(body).to.have.property(\"data\");",
+              "    pm.expect(body.data).to.be.an(\"array\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 - Admin Melihat Semua Booking (200)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/admin/bookings",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "bookings"
+          ]
+        },
+        "description": "Menggunakan token admin yang diperoleh pada request nomor 01.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{admin_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 200 for admin\", function () { pm.response.to.have.status(200); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 - Penghuni Ditolak dari Endpoint Admin (403)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/admin/bookings",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "admin",
+            "bookings"
+          ]
+        },
+        "description": "Memastikan middleware EnsureUserIsAdmin menolak akun penghuni.",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{resident_token}}",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP status 403 for non-admin user\", function () { pm.response.to.have.status(403); });",
+              "const body = pm.response.json();",
+              "pm.test(\"Forbidden message is correct\", function () {",
+              "    pm.expect(body.message).to.eql(\"Akses hanya untuk admin.\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
