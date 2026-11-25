@@ -47,6 +47,27 @@ class DamageReportSeeder extends Seeder
                     ['dilaporkan', 'Laporan diterima.', 0],
                 ],
             ],
+            [
+                'category' => 'lampu',
+                'description' => 'Lampu kamar mandi berkedip',
+                'status' => 'diproses',
+                'technician_name' => 'Pak Rudi',
+                'logs' => [
+                    ['dilaporkan', 'Laporan diterima.', 4],
+                    ['diproses', 'Teknisi akan membawa fitting baru.', 3],
+                ],
+            ],
+            [
+                'category' => 'air',
+                'description' => 'Air keran kamar mandi keruh',
+                'status' => 'selesai',
+                'technician_name' => 'Pak Hendra',
+                'logs' => [
+                    ['dilaporkan', 'Laporan diterima.', 12],
+                    ['diproses', 'Pengecekan pipa dilakukan.', 11],
+                    ['selesai', 'Pipa dibersihkan, air sudah jernih.', 10],
+                ],
+            ],
         ];
 
         foreach ($laporan as $item) {
