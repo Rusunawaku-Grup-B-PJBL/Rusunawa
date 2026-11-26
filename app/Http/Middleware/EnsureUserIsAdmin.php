@@ -12,7 +12,9 @@ class EnsureUserIsAdmin
     {
         if (! $request->user()?->isAdmin()) {
             return response()->json([
+                'status' => 'error',
                 'message' => 'Akses hanya untuk admin.',
+                'data' => null,
                 'errors' => (object) [],
             ], 403);
         }

@@ -47,9 +47,11 @@ class AuthController extends Controller
         if (! $user || ! Hash::check($data['password'], $user->password)) {
             // Sengaja 422 (bukan 401) agar klien tidak menganggapnya sesi kedaluwarsa.
             return response()->json([
-                'message' => 'Email atau kata sandi salah.',
-                'errors' => ['email' => ['Email atau kata sandi salah.']],
-            ], 422);
+    'status' => 'error',
+    'message' => 'Email atau kata sandi salah.',
+    'data' => null,
+    'errors' => ['email' => ['Email atau kata sandi salah.']],
+], 422);
         }
 
         return response()->json([
