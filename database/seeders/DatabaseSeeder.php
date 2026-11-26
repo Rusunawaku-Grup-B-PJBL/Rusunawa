@@ -13,8 +13,10 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RoomSeeder::class,
             BookingSeeder::class,
+            HandoverSeeder::class,
             DamageReportSeeder::class,
             AnnouncementSeeder::class,
+            ComplaintTicketSeeder::class,
         ]);
     }
 }

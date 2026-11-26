@@ -11,7 +11,7 @@ class RoomSeeder extends Seeder
     public function run(): void
     {
         $fasilitas = [];
-        foreach (['AC', 'Kamar mandi dalam', 'Wi-Fi', 'Lemari'] as $n) {
+        foreach (['AC', 'Kamar mandi dalam', 'Wi-Fi', 'Lemari', 'Dapur bersama'] as $n) {
             $fasilitas[$n] = Facility::create(['name' => $n]);
         }
 
@@ -39,7 +39,7 @@ class RoomSeeder extends Seeder
             [
                 'code' => 'C-301', 'floor' => 3, 'gender' => 'putra', 'capacity' => 3, 'deposit' => 450000,
                 'description' => 'Kamar 3 bed di Blok C lantai 3, kamar mandi bersama di ujung lorong.',
-                'fasilitas' => ['Wi-Fi', 'Lemari'],
+                'fasilitas' => ['Wi-Fi', 'Lemari', 'Dapur bersama'],
             ],
             [
                 'code' => 'C-302', 'floor' => 3, 'gender' => 'putri', 'capacity' => 4, 'deposit' => 500000,
