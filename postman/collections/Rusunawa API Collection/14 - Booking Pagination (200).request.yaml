@@ -1,0 +1,25 @@
+$kind: http-request
+description: Memastikan penghuni dapat melihat daftar booking miliknya.
+url: "{{base_url}}/api/bookings/mine?per_page=2"
+method: GET
+headers:
+  Accept: application/json
+queryParams:
+  per_page: "2"
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("200", () => pm.response.to.have.status(200));
+      const j = pm.response.json();
+      pm.test("format + meta", () => {
+        pm.expect(j.status).to.eql("success");
+        pm.expect(j.meta).to.have.property("current_page");
+        pm.expect(j.meta).to.have.property("total");
+        pm.expect(j).to.have.property("links");
+      });
+    language: text/javascript
+order: 11000

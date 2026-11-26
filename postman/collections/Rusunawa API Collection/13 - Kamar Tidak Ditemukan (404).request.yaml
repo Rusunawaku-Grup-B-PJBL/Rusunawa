@@ -1,0 +1,21 @@
+$kind: http-request
+description: Menggunakan room_id yang disimpan otomatis dari request daftar kamar. Jalankan setelah request nomor 06.
+url: "{{base_url}}/api/rooms/99999"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("404", () => pm.response.to.have.status(404));
+      pm.test("format error", () => {
+        const j = pm.response.json();
+        pm.expect(j.status).to.eql("error");
+        pm.expect(j.data).to.be.null;
+      });
+    language: text/javascript
+order: 9000

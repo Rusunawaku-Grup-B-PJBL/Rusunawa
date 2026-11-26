@@ -1,0 +1,14 @@
+$kind: http-request
+description: Memastikan endpoint yang dilindungi Sanctum menolak request tanpa token.
+url: "{{base_url}}/api/me"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: pm.test("HTTP status 401 without bearer token", function () {
+      pm.response.to.have.status(401); });
+    language: text/javascript
+order: 7000

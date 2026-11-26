@@ -1,0 +1,29 @@
+$kind: http-request
+description: Login akun penghuni dari UserSeeder. Menyimpan token ke collection
+  variable resident_token.
+url: "{{base_url}}/api/login"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "penghuni@ubbg.ac.id",
+      "password": "password"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 200", function () { pm.response.to.have.status(200); });
+      const data = pm.response.json();
+      pm.test("Response contains resident token", function () {
+          pm.expect(data).to.have.nested.property("data.token");
+      });
+      if (data.data && data.data.token) {
+          pm.collectionVariables.set("resident_token", data.data.token);
+      }
+    language: text/javascript
+order: 2000

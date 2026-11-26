@@ -1,0 +1,29 @@
+$kind: http-request
+description: Login menggunakan akun dari UserSeeder. Menyimpan token ke
+  collection variable admin_token.
+url: "{{base_url}}/api/login"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin@ubbg.ac.id",
+      "password": "password"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 200", function () { pm.response.to.have.status(200); });
+      const data = pm.response.json();
+      pm.test("Response contains admin token", function () {
+          pm.expect(data).to.have.nested.property("data.token");
+      });
+      if (data.data && data.data.token) {
+          pm.collectionVariables.set("admin_token", data.data.token);
+      }
+    language: text/javascript
+order: 1000

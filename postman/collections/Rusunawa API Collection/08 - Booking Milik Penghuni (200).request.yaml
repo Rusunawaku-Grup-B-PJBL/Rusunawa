@@ -1,0 +1,21 @@
+$kind: http-request
+description: Memastikan penghuni dapat melihat daftar booking miliknya.
+url: "{{base_url}}/api/bookings/mine"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 200", function () { pm.response.to.have.status(200); });
+      const data = pm.response.json();
+      pm.test("Response contains bookings array", function () {
+          pm.expect(data).to.have.property("data");
+          pm.expect(data.data).to.be.an("array");
+      });
+    language: text/javascript
+order: 13000

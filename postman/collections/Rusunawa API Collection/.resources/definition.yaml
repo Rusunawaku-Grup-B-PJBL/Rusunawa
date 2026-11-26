@@ -1,0 +1,9 @@
+$kind: collection
+description: Collection pengujian dasar API Rusunawa berdasarkan route, FormRequest, controller, middleware, dan seeder yang diperiksa. Jalankan berurutan menggunakan Collection Runner. Hasil baru dianggap aktual setelah Collection dijalankan pada server lokal.
+variables:
+  base_url: http://127.0.0.1:8000
+  admin_token: ""
+  resident_token: ""
+  room_id: ""
+  reg_nim: ""
+  reg_email: ""
