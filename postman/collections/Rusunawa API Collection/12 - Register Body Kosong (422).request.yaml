@@ -1,0 +1,26 @@
+$kind: http-request
+description: Controller memang mengembalikan HTTP 422 untuk kredensial yang salah.
+url: "{{base_url}}/api/register"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin@ubbg.ac.id",
+      "password": "password-salah"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("422", () => pm.response.to.have.status(422));
+      const j = pm.response.json();
+      pm.test("status error + errors", () => {
+        pm.expect(j.status).to.eql("error");
+        pm.expect(j.errors).to.be.an("object").that.is.not.empty;
+      });
+    language: text/javascript
+order: 4000

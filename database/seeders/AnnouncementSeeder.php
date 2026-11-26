@@ -25,6 +25,16 @@ class AnnouncementSeeder extends Seeder
                 'body' => 'Razia kamar akan dilakukan hari Jumat pukul 14.00. Pastikan kamar rapi dan tidak menyimpan barang terlarang.',
                 'published_at' => now()->subDays(2),
             ],
+            [
+                'title' => 'Pemadaman listrik Sabtu 09.00',
+                'body' => 'Akan ada pemadaman listrik terjadwal hari Sabtu pukul 09.00 sampai 12.00 untuk perawatan panel. Mohon mengisi daya perangkat sebelumnya.',
+                'published_at' => now()->subDays(3),
+            ],
+            [
+                'title' => 'Pembayaran sewa paling lambat tanggal 10',
+                'body' => 'Pembayaran sewa bulan ini paling lambat tanggal 10. Unggah bukti pembayaran melalui aplikasi.',
+                'published_at' => now()->subDays(4),
+            ],
         ];
 
         foreach ($data as $item) {

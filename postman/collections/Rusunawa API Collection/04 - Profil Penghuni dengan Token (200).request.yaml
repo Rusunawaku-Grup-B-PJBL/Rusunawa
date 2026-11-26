@@ -1,0 +1,20 @@
+$kind: http-request
+description: Memastikan token Sanctum penghuni dapat mengakses profil.
+url: "{{base_url}}/api/me"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 200", function () { pm.response.to.have.status(200); });
+      const data = pm.response.json();
+      pm.test("Profile response contains user identity", function () {
+          pm.expect(data).to.have.property("data");
+      });
+    language: text/javascript
+order: 6000

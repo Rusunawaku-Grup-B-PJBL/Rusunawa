@@ -18,15 +18,32 @@ use Throwable;
 class BookingController extends Controller
 {
     public function mine(): JsonResponse
-    {
-        $bookings = request()->user()->bookings()
-            ->with(['room', 'handovers'])
-            ->orderByDesc('created_at')
-            ->get()
-            ->map(fn (Booking $booking) => (new BookingResource($booking))->resolve());
+{
+    $perPage = min(max((int) request()->query('per_page', 10), 1), 50);
 
-        return response()->json(['data' => $bookings]);
-    }
+    $paginator = request()->user()->bookings()
+        ->with(['room', 'handovers'])
+        ->orderByDesc('created_at')
+        ->paginate($perPage);
+
+    $items = $paginator->getCollection()
+        ->map(fn (Booking $booking) => (new BookingResource($booking))->resolve())
+        ->values();
+
+    return response()->json([
+        'data' => $items,
+        'meta' => [
+            'current_page' => $paginator->currentPage(),
+            'per_page' => $paginator->perPage(),
+            'total' => $paginator->total(),
+            'last_page' => $paginator->lastPage(),
+        ],
+        'links' => [
+            'next' => $paginator->nextPageUrl(),
+            'prev' => $paginator->previousPageUrl(),
+        ],
+    ]);
+}
 
     public function store(StoreBookingRequest $request): JsonResponse
     {

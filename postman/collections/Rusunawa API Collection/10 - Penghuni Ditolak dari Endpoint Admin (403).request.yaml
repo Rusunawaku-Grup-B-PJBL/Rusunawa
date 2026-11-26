@@ -1,0 +1,20 @@
+$kind: http-request
+description: Memastikan middleware EnsureUserIsAdmin menolak akun penghuni.
+url: "{{base_url}}/api/admin/bookings"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 403 for non-admin user", function () { pm.response.to.have.status(403); });
+      const data = pm.response.json();
+      pm.test("Forbidden message is correct", function () {
+          pm.expect(data.message).to.eql("Akses hanya untuk admin.");
+      });
+    language: text/javascript
+order: 15000

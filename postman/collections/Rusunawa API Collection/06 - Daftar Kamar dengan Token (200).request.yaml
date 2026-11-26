@@ -1,0 +1,24 @@
+$kind: http-request
+description: Mengambil daftar kamar dan menyimpan ID kamar pertama untuk request detail.
+url: "{{base_url}}/api/rooms"
+method: GET
+headers:
+  Accept: application/json
+auth:
+  type: bearer
+  credentials:
+    token: "{{resident_token}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("HTTP status 200", function () { pm.response.to.have.status(200); });
+      const data = pm.response.json();
+      pm.test("Room collection contains data array", function () {
+          pm.expect(data).to.have.property("data");
+          pm.expect(data.data).to.be.an("array");
+      });
+      if (data.data && data.data.length > 0) {
+          pm.collectionVariables.set("room_id", String(data.data[0].id));
+      }
+    language: text/javascript
+order: 8000

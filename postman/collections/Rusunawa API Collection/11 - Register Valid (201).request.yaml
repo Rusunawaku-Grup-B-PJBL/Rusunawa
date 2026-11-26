@@ -1,0 +1,47 @@
+$kind: http-request
+description: Controller memang mengembalikan HTTP 422 untuk kredensial yang salah.
+url: "{{base_url}}/api/register"
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Mahasiswa Uji",
+      "nim": "{{reg_nim}}",
+      "email": "{{reg_email}}",
+      "phone": "081234567890",
+      "password": "password123",
+      "password_confirmation": "password123"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("201 Created", () => pm.response.to.have.status(201));
+      const j = pm.response.json();
+      pm.test("format {status,message,data}", () => {
+        pm.expect(j.status).to.eql("success");
+        pm.expect(j).to.have.property("message");
+        pm.expect(j).to.have.property("data");
+      });
+      pm.test("ada token", () => {
+        pm.expect(j.data.token).to.be.a("string").that.is.not.empty;
+      });
+      pm.test("tidak ada password/remember_token", () => {
+        const t = pm.response.text();
+        pm.expect(t).to.not.include('"password"');
+        pm.expect(t).to.not.include("remember_token");
+      });
+    language: text/javascript
+  - type: beforeRequest
+    code: "const stamp = Date.now();\r
+
+      pm.collectionVariables.set(\"reg_nim\", String(stamp));\r
+
+      pm.collectionVariables.set(\"reg_email\", \"uji\" + stamp +
+      \"@ubbg.ac.id\");"
+    language: text/javascript
+order: 3000
